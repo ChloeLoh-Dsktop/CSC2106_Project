@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <h1>Parking Lot Status</h1>
+    <div id="sensor-data-container">
+        <!-- Sensor data will be displayed here -->
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://127.0.0.1:8000/ws/sensor_data/');
+        let pollingInterval;
+
+        ws.onopen = function () {
+            console.log('WebSocket connection established');
+            ws.send(JSON.stringify({ action : 'request_update' }));
+            pollingInterval = setInterval(() => {
+                ws.send(JSON.stringify({ action: 'request_update' }));
+            }, 60000);
+        };
+
+        ws.onmessage = function (event) {
+            console.log("Received data:", event.data); // To see exactly what's received
+            const data = JSON.parse(event.data);
+            // If Flask-SocketIO is used, it may wrap the data in a message event
+            if (data.sensor_data && data.sensor_data.sensor_data) {
+                updateSensorData(data.sensor_data); // Make sure to pass the correct object
+            }
+        };
+
+        ws.onclose = function () {
+            console.log('WebSocket connection closed');
+            // Stop polling when the WebSocket connection is closed
+            clearInterval(pollingInterval);
+        };
+
+        function updateSensorData(sensorDataWrapper) {
+            // Access the nested sensorData array
+            const sensorData = sensorDataWrapper.sensor_data; // Adjust based on the actual structure
+            const container = document.getElementById('sensor-data-container');
+            container.innerHTML = ''; // Clear current content
+
+            sensorData.forEach(sensor => {
+                const status = sensor.occupancy_status ? 'Occupied' : 'Free';
+                const html = `
+                    <div>
+                        <p>Parking Lot ID: ${sensor.parking_lot_id}</p>
+                        <p>Status: ${status}</p>
+                        <p>Timestamp: ${sensor.timestamp}</p>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+    </script>
+
+</body>
+
+</html>

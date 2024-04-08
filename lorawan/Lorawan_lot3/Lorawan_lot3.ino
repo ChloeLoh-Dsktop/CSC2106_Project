@@ -24,6 +24,7 @@
 const int irSensorPin = A0;
 const int ultrasonicTrigPin = A1; // Trig pin of ultrasonic sensor
 const int ultrasonicEchoPin = A2; // Echo pin of ultrasonic sensor
+const int LEDPin = A3;
 
 // This EUI must be in little-endian format, so least-significant-byte
 // first. When copying an EUI from ttnctl output, this means to reverse
@@ -234,13 +235,18 @@ void do_send(osjob_t* j){
         Serial.println(infraredSensor);
         Serial.println(distance);
         uint32_t ultrasonicSensor = 0;
-        if (distance < 3 ){
+        if (distance < 10 || distance > 780 ){
           ultrasonicSensor = 1;
         }
         else{
           ultrasonicSensor = 0;
         }
-        
+        if (infraredSensor == 0 && ultrasonicSensor == 0){
+          digitalWrite(LEDPin, LOW);
+        }
+        else {
+          digitalWrite(LEDPin, HIGH);
+        }
         Serial.println(ultrasonicSensor);
 
         byte payload[16]; // Assuming AES encryption with 128-bit key size
@@ -294,6 +300,7 @@ void setup() {
     // Set the ultrasonic sensor pins
     pinMode(ultrasonicTrigPin, OUTPUT);
     pinMode(ultrasonicEchoPin, INPUT);
+    pinMode(LEDPin, OUTPUT);
     Serial.println(F("Starting"));
     //-----------------------------
     
