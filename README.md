@@ -34,7 +34,7 @@
 uvicorn myproject.asgi:application --reload 
 ``` 
 
-### MQTT subscriber
+### MQTT subscriber (Same device as Webserver)
 1. Ensure topic names are correct
 2. Run with python3 (In the same folder)
 ```
