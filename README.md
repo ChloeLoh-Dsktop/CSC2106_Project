@@ -45,3 +45,8 @@ python3 mqtt.py
 1. Ensure DEVEUI, APPEUI and APPKEY matches for that node.
 2. Upload the code for each node to the respective device via Arduino IDE
 3. Connect nodes to an external power source.
+
+### Connections
+1. Connect IR Sensor's D0 to A0 of LORA
+2. Connect Ultrasonic Sensor's Trigger and Echo Pins to A1 and A2 of LORA respectively
+3. Connect LED to A3 of LORA
